@@ -1,0 +1,39 @@
+body {
+  background-color: black;
+}
+
+.data-line {
+  animation: lineMove 30s linear infinite;
+  &.reverse {
+    animation: lineMove-reverse 30s linear infinite;
+  }
+  
+}
+
+@keyframes lineMove-reverse {
+  0% {
+    stroke-dashoffset: 0%;
+  }
+  
+  50% {
+    stroke-dashoffset: 50%;
+  }
+  
+  100% {
+    stroke-dashoffset: 100%;
+  }
+}
+
+@keyframes lineMove {
+  0% {
+    stroke-dashoffset: 100%;
+  }
+  
+  50% {
+    stroke-dashoffset: 50%;
+  }
+  
+  100% {
+    stroke-dashoffset: 0%;
+  }
+}

@@ -1,0 +1,620 @@
+// =============================================================================
+// PROFESYONEL 3D TESİS HARİTASI
+// Kapsamlı endüstriyel tesis görselleştirmesi
+// Tüm cihazlar, borular, sensörler, enerji akışı dahil
+// =============================================================================
+
+import { createFileRoute } from '@tanstack/react-router'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, PerspectiveCamera, Environment, Sky, ContactShadows } from '@react-three/drei'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { 
+  Zap, 
+  Battery, 
+  Sun, 
+  Droplets, 
+  Building2,
+  AlertCircle,
+  Settings2
+} from 'lucide-react'
+import { DetailedProductionBuilding } from './building-system'
+import { DetailedSolarFarm } from './solar-system'
+import { Trafo } from './facility-components'
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
+
+// =============================================================================
+// BATARYA DEPOLAMA SİSTEMİ
+// =============================================================================
+function BatteryStorage({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* 3 büyük batarya ünitesi */}
+      {[-3, 0, 3].map((x, i) => (
+        <group key={i} position={[x, 1.5, 0]}>
+          {/* Ana batarya kabini */}
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[2, 3, 1.5]} />
+            <meshStandardMaterial color="#15803d" roughness={0.3} metalness={0.7} />
+          </mesh>
+
+          {/* Şarj göstergesi LED'leri */}
+          {Array.from({ length: 10 }).map((_, j) => {
+            const charge = 85 - i * 10
+            const isActive = j < (charge / 10)
+            return (
+              <mesh key={j} position={[0.76, 1.2 - j * 0.25, 0]}>
+                <boxGeometry args={[0.05, 0.15, 0.3]} />
+                <meshStandardMaterial 
+                  color={isActive ? '#22c55e' : '#374151'} 
+                  emissive={isActive ? '#22c55e' : '#000000'} 
+                  emissiveIntensity={isActive ? 0.5 : 0} 
+                />
+              </mesh>
+            )
+          })}
+
+          {/* Soğutma fanı */}
+          <mesh position={[0, 1.6, 0]} castShadow>
+            <cylinderGeometry args={[0.4, 0.4, 0.1, 32]} />
+            <meshStandardMaterial color="#94a3b8" roughness={0.3} metalness={0.7} />
+          </mesh>
+
+          {/* Bağlantı kabloları */}
+          <mesh position={[0, -1.6, 0]} castShadow>
+            <cylinderGeometry args={[0.1, 0.1, 0.3, 8]} />
+            <meshStandardMaterial color="#64748b" roughness={0.4} metalness={0.6} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Kontrol paneli */}
+      <mesh position={[0, 0.8, 1]} castShadow receiveShadow>
+        <boxGeometry args={[1.5, 1.2, 0.3]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.7} />
+      </mesh>
+
+      {/* Dijital ekran */}
+      <mesh position={[0, 0.8, 1.16]}>
+        <boxGeometry args={[1.2, 0.8, 0.02]} />
+        <meshStandardMaterial 
+          color="#0f172a" 
+          emissive="#22c55e" 
+          emissiveIntensity={0.3} 
+        />
+      </mesh>
+    </group>
+  )
+}
+
+// =============================================================================
+// ŞEBEKE BAĞLANTI NOKTASI
+// =============================================================================
+function GridConnection({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Ana trafo */}
+      <Trafo 
+        position={[0, 0, 0]} 
+        name="Ana Trafo" 
+        primaryVoltage="154 kV" 
+        secondaryVoltage="34.5 kV" 
+        capacity="2.5 MVA" 
+      />
+
+      {/* Yüksek gerilim direkleri */}
+      {[-8, 8].map((x, i) => (
+        <group key={i} position={[x, 0, 0]}>
+          {/* Direk */}
+          <mesh castShadow>
+            <cylinderGeometry args={[0.3, 0.35, 12, 16]} />
+            <meshStandardMaterial color="#78716c" roughness={0.6} metalness={0.4} />
+          </mesh>
+
+          {/* Çapraz destekler */}
+          <mesh position={[0, 5, 0]} rotation={[0, 0, Math.PI / 6]} castShadow>
+            <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
+            <meshStandardMaterial color="#57534e" roughness={0.6} metalness={0.4} />
+          </mesh>
+
+          {/* İzolatörler */}
+          {[-1, 0, 1].map((z, j) => (
+            <mesh key={j} position={[0, 6, z]} castShadow>
+              <cylinderGeometry args={[0.1, 0.15, 0.5, 12]} />
+              <meshStandardMaterial color="#f8fafc" roughness={0.2} metalness={0.1} />
+            </mesh>
+          ))}
+
+          {/* Yüksek gerilim hatları */}
+          {[-1, 0, 1].map((z, j) => (
+            <mesh key={j} position={[x / 2, 6.3, z]}>
+              <cylinderGeometry args={[0.02, 0.02, Math.abs(x), 8]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.7} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </group>
+  )
+}
+
+// =============================================================================
+// SU DEPOSU SİSTEMİ
+// =============================================================================
+function WaterTank({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Ana su deposu */}
+      <mesh castShadow receiveShadow>
+        <cylinderGeometry args={[3, 3, 6, 32]} />
+        <meshStandardMaterial color="#0284c7" roughness={0.2} metalness={0.8} />
+      </mesh>
+
+      {/* Kubbe çatı */}
+      <mesh position={[0, 3.5, 0]} castShadow>
+        <sphereGeometry args={[3.1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#0369a1" roughness={0.3} metalness={0.7} />
+      </mesh>
+
+      {/* Seviye göstergesi */}
+      <mesh position={[3.2, 0, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 5, 16]} />
+        <meshStandardMaterial color="#f8fafc" transparent opacity={0.5} roughness={0.1} />
+      </mesh>
+
+      {/* Su seviyesi (içeride) */}
+      <mesh position={[3.2, -0.5, 0]}>
+        <cylinderGeometry args={[0.12, 0.12, 4, 16]} />
+        <meshStandardMaterial color="#38bdf8" emissive="#0ea5e9" emissiveIntensity={0.3} />
+      </mesh>
+
+      {/* Giriş/Çıkış boruları */}
+      <mesh position={[-3.2, -2, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 1, 16]} />
+        <meshStandardMaterial color="#0ea5e9" roughness={0.4} metalness={0.6} />
+      </mesh>
+      <mesh position={[3.2, -2, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 1, 16]} />
+        <meshStandardMaterial color="#dc2626" roughness={0.4} metalness={0.6} />
+      </mesh>
+
+      {/* Destek ayakları */}
+      {[-2, 2].map((x) =>
+        [-2, 2].map((z) => (
+          <mesh key={`${x}-${z}`} position={[x, -4, z]} castShadow>
+            <cylinderGeometry args={[0.2, 0.3, 2, 8]} />
+            <meshStandardMaterial color="#64748b" roughness={0.5} metalness={0.6} />
+          </mesh>
+        ))
+      )}
+    </group>
+  )
+}
+
+// =============================================================================
+// ENERJI AKIŞ ÇİZGİLERİ (Animasyonlu)
+// =============================================================================
+function EnergyFlowLine({ 
+  start, 
+  end, 
+  color = '#22c55e',
+  controlOffset = 5 
+}: { 
+  start: [number, number, number]
+  end: [number, number, number]
+  color?: string
+  controlOffset?: number
+}) {
+  const lineRef = useRef<THREE.Points>(null)
+
+  useFrame(() => {
+    if (lineRef.current) {
+      const positions = lineRef.current.geometry.attributes.position.array as Float32Array
+      for (let i = 0; i < positions.length; i += 3) {
+        // Parçacıkları eğri boyunca hareket ettir
+        const t = (positions[i + 3] + 0.01) % 1
+        positions[i + 3] = t
+      }
+      lineRef.current.geometry.attributes.position.needsUpdate = true
+    }
+  })
+
+  // QuadraticBezierCurve3 kullanarak eğri oluştur
+  const startVec = new THREE.Vector3(...start)
+  const endVec = new THREE.Vector3(...end)
+  const midPoint = new THREE.Vector3().lerpVectors(startVec, endVec, 0.5)
+  midPoint.y += controlOffset
+
+  const curve = new THREE.QuadraticBezierCurve3(startVec, midPoint, endVec)
+  const points = curve.getPoints(50)
+
+  // Hat geometrisi
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points)
+
+  // Parçacıklar için pozisyonlar
+  const particleCount = 15
+  const particlePositions = new Float32Array(particleCount * 4) // x, y, z, t
+  for (let i = 0; i < particleCount; i++) {
+    const t = i / particleCount
+    const point = curve.getPoint(t)
+    particlePositions[i * 4] = point.x
+    particlePositions[i * 4 + 1] = point.y
+    particlePositions[i * 4 + 2] = point.z
+    particlePositions[i * 4 + 3] = t
+  }
+
+  return (
+    <group>
+      {/* Ana çizgi */}
+      <primitive object={new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color, linewidth: 2, transparent: true, opacity: 0.4 }))} />
+
+      {/* Animasyonlu parçacıklar */}
+      <points ref={lineRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[particlePositions, 4]}
+            count={particleCount}
+          />
+        </bufferGeometry>
+        <pointsMaterial size={0.3} color={color} transparent opacity={0.8} sizeAttenuation />
+      </points>
+    </group>
+  )
+}
+
+// =============================================================================
+// ZEMIN
+// =============================================================================
+function Ground() {
+  return (
+    <group>
+      {/* Ana zemin */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
+        <planeGeometry args={[150, 150]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.9} metalness={0.1} />
+      </mesh>
+
+      {/* Grid çizgileri */}
+      <gridHelper args={[150, 30, '#475569', '#334155']} position={[0, 0, 0]} />
+
+      {/* Temas gölgeleri */}
+      <ContactShadows 
+        position={[0, 0, 0]} 
+        opacity={0.5} 
+        scale={100} 
+        blur={2} 
+        far={20} 
+      />
+    </group>
+  )
+}
+
+// =============================================================================
+// 3D SAHNE
+// =============================================================================
+function Scene() {
+  return (
+    <>
+      {/* Işıklandırma */}
+      <ambientLight intensity={0.4} />
+      <directionalLight
+        position={[50, 50, 25]}
+        intensity={1}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={100}
+        shadow-camera-left={-50}
+        shadow-camera-right={50}
+        shadow-camera-top={50}
+        shadow-camera-bottom={-50}
+      />
+      <hemisphereLight intensity={0.3} groundColor="#1e293b" />
+
+      {/* Ortam */}
+      <Sky sunPosition={[100, 20, 100]} />
+      <Environment preset="city" />
+
+      {/* Zemin */}
+      <Ground />
+
+      {/* ===== ANA BAĞLANTI VE CİHAZLAR ===== */}
+      
+      {/* 3 Katlı Üretim Binası - Sol taraf */}
+      <DetailedProductionBuilding position={[-30, 0, 0]} />
+
+      {/* 48 Panelli Güneş Santrali - Sağ ön */}
+      <DetailedSolarFarm position={[30, 0, -10]} />
+
+      {/* Batarya Depolama - Sağ arka */}
+      <BatteryStorage position={[30, 0, 20]} />
+
+      {/* Şebeke Bağlantısı - Merkez arka */}
+      <GridConnection position={[0, 0, 35]} />
+
+      {/* Su Deposu - Sol arka */}
+      <WaterTank position={[-30, 0, 25]} />
+
+      {/* ===== ENERJI AKIŞ ÇİZGİLERİ ===== */}
+      
+      {/* Güneş santralinden bataryaya */}
+      <EnergyFlowLine 
+        start={[30, 2, -10]} 
+        end={[30, 2, 20]} 
+        color="#fbbf24" 
+        controlOffset={8} 
+      />
+
+      {/* Güneş santralinden binaya */}
+      <EnergyFlowLine 
+        start={[30, 2, -10]} 
+        end={[-30, 6, 0]} 
+        color="#22c55e" 
+        controlOffset={10} 
+      />
+
+      {/* Bataryadan binaya */}
+      <EnergyFlowLine 
+        start={[30, 2, 20]} 
+        end={[-30, 6, 0]} 
+        color="#06b6d4" 
+        controlOffset={9} 
+      />
+
+      {/* Şebekeden binaya */}
+      <EnergyFlowLine 
+        start={[0, 6, 35]} 
+        end={[-30, 6, 0]} 
+        color="#3b82f6" 
+        controlOffset={12} 
+      />
+
+      {/* Binadan şebekeye (export) */}
+      <EnergyFlowLine 
+        start={[-30, 10, 0]} 
+        end={[0, 8, 35]} 
+        color="#a855f7" 
+        controlOffset={15} 
+      />
+
+      {/* Su deposundan binaya */}
+      <EnergyFlowLine 
+        start={[-30, 3, 25]} 
+        end={[-30, 2, 0]} 
+        color="#0ea5e9" 
+        controlOffset={6} 
+      />
+
+      {/* Kamera */}
+      <PerspectiveCamera makeDefault position={[50, 40, 50]} fov={50} />
+      <OrbitControls 
+        enablePan={true}
+        enableZoom={true}
+        enableRotate={true}
+        autoRotate={true}
+        autoRotateSpeed={0.3}
+        maxPolarAngle={Math.PI / 2.2}
+        minDistance={20}
+        maxDistance={120}
+      />
+    </>
+  )
+}
+
+// =============================================================================
+// ANA SAYFA BİLEŞENİ
+// =============================================================================
+export default function MapPage() {
+  return (
+    <div className="flex h-[calc(100vh-4rem)] gap-4 p-6">
+      {/* Sol panel - İstatistikler */}
+      <div className="flex w-80 flex-col gap-4">
+        {/* Anlık Durum Kartları */}
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="border-green-500/20 bg-card p-3">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-green-500/10 p-2">
+                <Sun className="h-4 w-4 text-green-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Güneş</span>
+                <span className="text-lg font-bold text-green-400">277 kW</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="border-blue-500/20 bg-card p-3">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-blue-500/10 p-2">
+                <Zap className="h-4 w-4 text-blue-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Şebeke</span>
+                <span className="text-lg font-bold text-blue-400">68 kW</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="border-cyan-500/20 bg-card p-3">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-cyan-500/10 p-2">
+                <Battery className="h-4 w-4 text-cyan-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Batarya</span>
+                <span className="text-lg font-bold text-cyan-400">%85</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="border-purple-500/20 bg-card p-3">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-purple-500/10 p-2">
+                <Building2 className="h-4 w-4 text-purple-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Tüketim</span>
+                <span className="text-lg font-bold text-purple-400">345 kW</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Tesis Varlıkları */}
+        <Card className="border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Tesis Varlıkları</h3>
+            <Badge variant="secondary" className="text-xs">6 Bileşen</Badge>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-blue-500/10 p-1.5">
+                  <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                </div>
+                <span className="text-xs font-medium">Üretim Binası (3 Kat)</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Aktif</Badge>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-yellow-500/10 p-1.5">
+                  <Sun className="h-3.5 w-3.5 text-yellow-400" />
+                </div>
+                <span className="text-xs font-medium">Güneş Santrali (48 Panel)</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Aktif</Badge>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-cyan-500/10 p-1.5">
+                  <Battery className="h-3.5 w-3.5 text-cyan-400" />
+                </div>
+                <span className="text-xs font-medium">Batarya Depolama (3 Ünite)</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Şarj</Badge>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-purple-500/10 p-1.5">
+                  <Zap className="h-3.5 w-3.5 text-purple-400" />
+                </div>
+                <span className="text-xs font-medium">Şebeke Bağlantısı (2.5 MVA)</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Çevrimiçi</Badge>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-blue-500/10 p-1.5">
+                  <Droplets className="h-3.5 w-3.5 text-blue-400" />
+                </div>
+                <span className="text-xs font-medium">Su Deposu (100 m³)</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Normal</Badge>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2 hover:bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="rounded bg-orange-500/10 p-1.5">
+                  <Settings2 className="h-3.5 w-3.5 text-orange-400" />
+                </div>
+                <span className="text-xs font-medium">4 Inverter İstasyonu</span>
+              </div>
+              <Badge className="bg-green-500/10 text-green-400 hover:bg-green-500/20">Çalışıyor</Badge>
+            </div>
+          </div>
+        </Card>
+
+        {/* Aktif Uyarılar */}
+        <Card className="border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Sistem Durumu</h3>
+            <Badge variant="secondary" className="text-xs">2 Uyarı</Badge>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-amber-400">Yüksek Sıcaklık</span>
+                <span className="text-[10px] text-muted-foreground">Zemin kat - Üretim alanı: 28°C</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-amber-400">Jeneratör Sıcaklığı</span>
+                <span className="text-[10px] text-muted-foreground">2. Kat - Yedek jeneratör: 65°C</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Enerji Akış Özeti */}
+        <Card className="border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Enerji Akışı</h3>
+          </div>
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-400" />
+                <span className="text-xs">Güneş → Tesis</span>
+              </div>
+              <span className="text-xs font-bold text-green-400">+277 kW</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-cyan-400" />
+                <span className="text-xs">Batarya → Tesis</span>
+              </div>
+              <span className="text-xs font-bold text-green-400">+52 kW</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-blue-400" />
+                <span className="text-xs">Şebeke → Tesis</span>
+              </div>
+              <span className="text-xs font-bold text-green-400">+68 kW</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-purple-400" />
+                <span className="text-xs">Tesis → Şebeke</span>
+              </div>
+              <span className="text-xs font-bold text-purple-400">-52 kW</span>
+            </div>
+
+            <div className="mt-3 border-t border-border pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium">Net Tüketim</span>
+                <span className="text-sm font-bold text-purple-400">345 kW</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Ana 3D görünüm */}
+      <Card className="flex-1 overflow-hidden border-border bg-slate-950">
+        <Canvas shadows>
+          <Scene />
+        </Canvas>
+      </Card>
+    </div>
+  )
+}
+
+export const Route = createFileRoute('/_authenticated/map/')({
+  component: MapPage,
+})
