@@ -32,19 +32,19 @@ import {
 } from "@/components/ui/professional-charts"
 
 // Aylık tüketim verileri - Endüstriyel fabrika
-const monthlyWaterData = [
-  { ay: "Oca", proses: 1850, sogutma: 2200, kazan: 420 },
-  { ay: "Şub", proses: 1820, sogutma: 2100, kazan: 410 },
-  { ay: "Mar", proses: 1880, sogutma: 2400, kazan: 380 },
-  { ay: "Nis", proses: 1920, sogutma: 2800, kazan: 340 },
-  { ay: "May", proses: 1980, sogutma: 3200, kazan: 280 },
-  { ay: "Haz", proses: 2050, sogutma: 3800, kazan: 220 },
-  { ay: "Tem", proses: 2100, sogutma: 4200, kazan: 180 },
-  { ay: "Ağu", proses: 2080, sogutma: 4100, kazan: 190 },
-  { ay: "Eyl", proses: 1950, sogutma: 3400, kazan: 260 },
-  { ay: "Eki", proses: 1890, sogutma: 2600, kazan: 350 },
-  { ay: "Kas", proses: 1860, sogutma: 2200, kazan: 400 },
-  { ay: "Ara", proses: 1840, sogutma: 2100, kazan: 430 },
+const getMonthlyWaterData = (t: any) => [
+  { ay: t('january'), proses: 1850, sogutma: 2200, kazan: 420 },
+  { ay: t('february'), proses: 1820, sogutma: 2100, kazan: 410 },
+  { ay: t('march'), proses: 1880, sogutma: 2400, kazan: 380 },
+  { ay: t('april'), proses: 1920, sogutma: 2800, kazan: 340 },
+  { ay: t('may'), proses: 1980, sogutma: 3200, kazan: 280 },
+  { ay: t('june'), proses: 2050, sogutma: 3800, kazan: 220 },
+  { ay: t('july'), proses: 2100, sogutma: 4200, kazan: 180 },
+  { ay: t('august'), proses: 2080, sogutma: 4100, kazan: 190 },
+  { ay: t('september'), proses: 1950, sogutma: 3400, kazan: 260 },
+  { ay: t('october'), proses: 1890, sogutma: 2600, kazan: 350 },
+  { ay: t('november'), proses: 1860, sogutma: 2200, kazan: 400 },
+  { ay: t('december'), proses: 1840, sogutma: 2100, kazan: 430 },
 ]
 
 // Saatlik tüketim
@@ -64,40 +64,46 @@ const hourlyData = [
 ]
 
 // Tank seviyeleri - Endüstriyel
-const tanklar = [
-  { id: "TANK-01", ad: "Ana Proses Deposu", kapasite: 100000, doluluk: 78, sicaklik: 18 },
-  { id: "TANK-02", ad: "Soğutma Suyu Tankı", kapasite: 50000, doluluk: 92, sicaklik: 22 },
-  { id: "TANK-03", ad: "Yangın Söndürme", kapasite: 80000, doluluk: 100, sicaklik: 16 },
-  { id: "TANK-04", ad: "Arıtılmış Su Tankı", kapasite: 30000, doluluk: 65, sicaklik: 20 },
+const getTanklar = (t: any) => [
+  { id: "TANK-01", ad: t('mainProcessTank'), kapasite: 100000, doluluk: 78, sicaklik: 18 },
+  { id: "TANK-02", ad: t('coolingWaterTank'), kapasite: 50000, doluluk: 92, sicaklik: 22 },
+  { id: "TANK-03", ad: t('fireExtinguishing'), kapasite: 80000, doluluk: 100, sicaklik: 16 },
+  { id: "TANK-04", ad: t('treatedWaterTank'), kapasite: 30000, doluluk: 65, sicaklik: 20 },
 ]
 
 // Su kalitesi metrikleri
-const suKalitesi = [
-  { metrik: "pH Seviyesi", deger: 7.2, birim: "", min: 6.5, max: 8.5, durum: "iyi" },
-  { metrik: "İletkenlik", deger: 450, birim: "µS/cm", min: 0, max: 1000, durum: "iyi" },
-  { metrik: "Bulanıklık", deger: 0.8, birim: "NTU", min: 0, max: 4, durum: "iyi" },
-  { metrik: "Sertlik", deger: 180, birim: "mg/L", min: 0, max: 300, durum: "iyi" },
+const getSuKalitesi = (t: any) => [
+  { metrik: t('phLevel'), deger: 7.2, birim: "", min: 6.5, max: 8.5, durum: t('good') },
+  { metrik: t('conductivity'), deger: 450, birim: "µS/cm", min: 0, max: 1000, durum: t('good') },
+  { metrik: t('turbidity'), deger: 0.8, birim: "NTU", min: 0, max: 4, durum: t('good') },
+  { metrik: t('hardness'), deger: 180, birim: "mg/L", min: 0, max: 300, durum: t('good') },
 ]
 
 // Kullanım alanlarına göre dağılım
-const waterDistribution = [
-  { name: "Proses", value: 45, color: "#06b6d4" },
-  { name: "Soğutma", value: 35, color: "#3b82f6" },
-  { name: "Kazan", value: 12, color: "#8b5cf6" },
-  { name: "Diğer", value: 8, color: "#22c55e" },
+const getWaterDistribution = (t: any) => [
+  { name: t('process'), value: 45, color: "#06b6d4" },
+  { name: t('cooling'), value: 35, color: "#3b82f6" },
+  { name: t('boiler'), value: 12, color: "#8b5cf6" },
+  { name: t('other'), value: 8, color: "#22c55e" },
 ]
 
 // Sızıntı algılama - Endüstriyel hatlar
-const sizintiAlanlari = [
-  { alan: "Ana Besleme Hattı", durum: "normal", sonKontrol: "2 dk önce" },
-  { alan: "Üretim A Blok", durum: "normal", sonKontrol: "5 dk önce" },
-  { alan: "Soğutma Sistemi", durum: "uyari", sonKontrol: "1 dk önce" },
-  { alan: "Kazan Dairesi", durum: "normal", sonKontrol: "3 dk önce" },
+const getSizintiAlanlari = (t: any) => [
+  { alan: t('mainSupplyLine'), durum: "normal", sonKontrol: t('minutesAgo').replace('{minutes}', '2') },
+  { alan: t('productionBlockA'), durum: "normal", sonKontrol: t('minutesAgo').replace('{minutes}', '5') },
+  { alan: t('coolingSystem'), durum: "uyari", sonKontrol: t('minutesAgo').replace('{minutes}', '1') },
+  { alan: t('boilerRoom'), durum: "normal", sonKontrol: t('minutesAgo').replace('{minutes}', '3') },
 ]
 
 export default function WaterPage() {
   const { t, language } = useLanguage()
   const [currentTime, setCurrentTime] = useState(new Date())
+  
+  const monthlyWaterData = getMonthlyWaterData(t)
+  const tanklar = getTanklar(t)
+  const suKalitesi = getSuKalitesi(t)
+  const waterDistribution = getWaterDistribution(t)
+  const sizintiAlanlari = getSizintiAlanlari(t)
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)

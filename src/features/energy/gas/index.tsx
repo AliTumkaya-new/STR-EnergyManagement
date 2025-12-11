@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+﻿import { useState, useEffect, useMemo } from "react"
 import { useLanguage } from "@/lib/i18n"
 import {
   Flame,
@@ -62,33 +62,31 @@ const dailyConsumption = [
   { gun: "Paz", sabah: 20, ogle: 14, aksam: 28, gece: 16 },
 ]
 
-// Sezonluk analiz
-const seasonalData = [
-  { sezon: "Kış", tuketim: 9500, maliyet: 47500, tasarruf: 8, icon: Snowflake },
-  { sezon: "İlkbahar", tuketim: 5400, maliyet: 27000, tasarruf: 12, icon: Wind },
-  { sezon: "Yaz", tuketim: 2050, maliyet: 10250, tasarruf: 15, icon: CloudSun },
-  { sezon: "Sonbahar", tuketim: 5500, maliyet: 27500, tasarruf: 10, icon: Wind },
-]
-
-// Cihaz verileri
-const cihazlar = [
-  { ad: "Ana Kazan", durum: "calisyor", sicaklik: 72, verimlilik: 94, yakitTuketimi: 4.2 },
-  { ad: "Yedek Kazan", durum: "beklemede", sicaklik: 22, verimlilik: 0, yakitTuketimi: 0 },
-  { ad: "Kombi 1", durum: "calisyor", sicaklik: 65, verimlilik: 91, yakitTuketimi: 1.8 },
-  { ad: "Kombi 2", durum: "calisyor", sicaklik: 68, verimlilik: 89, yakitTuketimi: 2.1 },
-]
-
-// Kullanım alanları
-const usageDistribution = [
-  { name: "Isıtma", value: 65, color: "#f97316" },
-  { name: "Sıcak Su", value: 20, color: "#3b82f6" },
-  { name: "Üretim", value: 10, color: "#22c55e" },
-  { name: "Diğer", value: 5, color: "#8b5cf6" },
-]
-
 export default function GasPage() {
   const { t, language } = useLanguage()
   const [currentTime, setCurrentTime] = useState(new Date())
+
+  // Dinamik çeviri gerektiren veriler
+  const seasonalData = useMemo(() => [
+    { id: "winter", sezon: t("winter"), tuketim: 9500, maliyet: 47500, tasarruf: 8, icon: Snowflake },
+    { id: "spring", sezon: t("spring"), tuketim: 5400, maliyet: 27000, tasarruf: 12, icon: Wind },
+    { id: "summer", sezon: t("summer"), tuketim: 2050, maliyet: 10250, tasarruf: 15, icon: CloudSun },
+    { id: "autumn", sezon: t("autumn"), tuketim: 5500, maliyet: 27500, tasarruf: 10, icon: Wind },
+  ], [t])
+
+  const cihazlar = useMemo(() => [
+    { ad: t("mainBoiler"), durum: "calisyor", sicaklik: 72, verimlilik: 94, yakitTuketimi: 4.2 },
+    { ad: t("backupBoiler"), durum: "beklemede", sicaklik: 22, verimlilik: 0, yakitTuketimi: 0 },
+    { ad: t("combi1"), durum: "calisyor", sicaklik: 65, verimlilik: 91, yakitTuketimi: 1.8 },
+    { ad: t("combi2"), durum: "calisyor", sicaklik: 68, verimlilik: 89, yakitTuketimi: 2.1 },
+  ], [t])
+
+  const usageDistribution = useMemo(() => [
+    { name: t("heating"), value: 65, color: "#f97316" },
+    { name: t("hotWater"), value: 20, color: "#3b82f6" },
+    { name: t("productionLabel"), value: 10, color: "#22c55e" },
+    { name: t("other"), value: 5, color: "#8b5cf6" },
+  ], [t])
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -371,10 +369,10 @@ export default function GasPage() {
                   {seasonalData.map((sezon) => {
                     const Icon = sezon.icon
                     return (
-                      <div key={sezon.sezon} className="flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-lg hover:scale-105">
+                      <div key={sezon.id} className="flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-lg hover:scale-105">
                         <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                          sezon.sezon === "Kış" ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" :
-                          sezon.sezon === "Yaz" ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" :
+                          sezon.id === "winter" ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" :
+                          sezon.id === "summer" ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" :
                           "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                         }`}>
                           <Icon className="h-6 w-6" />

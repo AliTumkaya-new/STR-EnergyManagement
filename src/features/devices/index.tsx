@@ -76,17 +76,17 @@ interface Device {
   alerts: number
 }
 
-// Mock cihaz verileri
-const mockDevices: Device[] = [
+// Mock cihaz verileri - Dinamik çeviri ile
+const getMockDevices = (t: (key: any) => string): Device[] => [
   {
     id: 'DEV-001',
     serialNumber: 'STR-EM-2024-00001',
-    name: 'Ana Sayaç - Bina A',
+    name: t('mainMeterBuildingA'),
     type: 'energy_meter',
     status: 'online',
-    location: 'Bina A - Giriş',
-    zone: 'Bölge 1',
-    lastSeen: '2 dakika önce',
+    location: t('locationBuildingAEntrance'),
+    zone: t('zone1'),
+    lastSeen: t('twoMinutesAgo'),
     firmware: 'v2.4.1',
     signalStrength: 95,
     batteryLevel: null,
@@ -97,21 +97,21 @@ const mockDevices: Device[] = [
     installDate: '2024-01-15',
     lastMaintenance: '2024-11-01',
     readings: [
-      { label: 'Anlık Güç', value: '245.6', unit: 'kW' },
-      { label: 'Günlük Tüketim', value: '1,847', unit: 'kWh' },
-      { label: 'Gerilim', value: '398', unit: 'V' },
+      { label: t('instantPower'), value: '245.6', unit: 'kW' },
+      { label: t('dailyConsumption'), value: '1,847', unit: 'kWh' },
+      { label: t('voltageLabel'), value: '398', unit: 'V' },
     ],
     alerts: 0
   },
   {
     id: 'DEV-002',
     serialNumber: 'STR-SI-2024-00015',
-    name: 'Solar İnverter #1',
+    name: t('solarInverterOne'),
     type: 'solar_inverter',
     status: 'online',
-    location: 'Çatı - Batı',
-    zone: 'Bölge 2',
-    lastSeen: '1 dakika önce',
+    location: t('locationRoofWest'),
+    zone: t('zone2'),
+    lastSeen: t('oneMinuteAgo'),
     firmware: 'v3.1.0',
     signalStrength: 88,
     batteryLevel: null,
@@ -122,21 +122,21 @@ const mockDevices: Device[] = [
     installDate: '2024-03-20',
     lastMaintenance: '2024-10-15',
     readings: [
-      { label: 'DC Giriş', value: '52.4', unit: 'kW' },
-      { label: 'AC Çıkış', value: '48.7', unit: 'kW' },
-      { label: 'Verimlilik', value: '92.9', unit: '%' },
+      { label: t('dcInput'), value: '52.4', unit: 'kW' },
+      { label: t('acOutput'), value: '48.7', unit: 'kW' },
+      { label: t('efficiencyLabel'), value: '92.9', unit: '%' },
     ],
     alerts: 0
   },
   {
     id: 'DEV-003',
     serialNumber: 'STR-SI-2024-00016',
-    name: 'Solar İnverter #2',
+    name: t('solarInverterTwo'),
     type: 'solar_inverter',
     status: 'warning',
-    location: 'Çatı - Doğu',
-    zone: 'Bölge 2',
-    lastSeen: '5 dakika önce',
+    location: t('locationRoofEast'),
+    zone: t('zone2'),
+    lastSeen: t('fiveMinutesAgo'),
     firmware: 'v3.0.8',
     signalStrength: 72,
     batteryLevel: null,
@@ -147,9 +147,9 @@ const mockDevices: Device[] = [
     installDate: '2024-03-20',
     lastMaintenance: '2024-09-01',
     readings: [
-      { label: 'DC Giriş', value: '45.2', unit: 'kW' },
+      { label: t('dcInput'), value: '45.2', unit: 'kW' },
       { label: 'AC Çıkış', value: '38.1', unit: 'kW' },
-      { label: 'Verimlilik', value: '84.3', unit: '%' },
+      { label: t('efficiencyLabel'), value: '84.3', unit: '%' },
     ],
     alerts: 2
   },
@@ -198,14 +198,14 @@ const mockDevices: Device[] = [
     lastMaintenance: '2024-10-20',
     readings: [
       { label: 'Sıcaklık', value: '45.2', unit: '°C' },
-      { label: 'Nem', value: '38', unit: '%' },
+      { label: t('humidityLabel'), value: '38', unit: '%' },
     ],
     alerts: 0
   },
   {
     id: 'DEV-006',
     serialNumber: 'STR-GW-2024-00001',
-    name: 'Ana Gateway',
+    name: t('mainGateway'),
     type: 'gateway',
     status: 'online',
     location: 'Kontrol Odası',
@@ -221,7 +221,7 @@ const mockDevices: Device[] = [
     installDate: '2024-01-10',
     lastMaintenance: '2024-11-15',
     readings: [
-      { label: 'Bağlı Cihaz', value: '47', unit: 'adet' },
+      { label: 'Bağlı Cihaz', value: '47', unit: t('unitPieces') },
       { label: 'Uptime', value: '99.9', unit: '%' },
       { label: 'Veri Trafiği', value: '2.4', unit: 'GB/gün' },
     ],
@@ -233,7 +233,7 @@ const mockDevices: Device[] = [
     name: 'Trafo Monitörü',
     type: 'transformer',
     status: 'online',
-    location: 'Trafo Merkezi',
+    location: t('locationTransformerCenter'),
     zone: 'Bölge 3',
     lastSeen: '2 dakika önce',
     firmware: 'v2.1.4',
@@ -248,7 +248,7 @@ const mockDevices: Device[] = [
     readings: [
       { label: 'Yük', value: '78', unit: '%' },
       { label: 'Yağ Sıcaklığı', value: '62', unit: '°C' },
-      { label: 'Gerilim', value: '34.5', unit: 'kV' },
+      { label: t('voltageLabel'), value: '34.5', unit: 'kV' },
     ],
     alerts: 0
   },
@@ -258,7 +258,7 @@ const mockDevices: Device[] = [
     name: 'Su Sayacı - Ana Hat',
     type: 'water_meter',
     status: 'online',
-    location: 'Mekanik Oda',
+    location: t('locationMechanicalRoom'),
     zone: 'Bölge 1',
     lastSeen: '3 dakika önce',
     firmware: 'v1.5.2',
@@ -283,7 +283,7 @@ const mockDevices: Device[] = [
     name: 'Gaz Sayacı - Kazan',
     type: 'gas_meter',
     status: 'offline',
-    location: 'Kazan Dairesi',
+    location: t('locationBoilerRoom'),
     zone: 'Bölge 4',
     lastSeen: '2 saat önce',
     firmware: 'v1.3.1',
@@ -296,7 +296,7 @@ const mockDevices: Device[] = [
     installDate: '2024-02-28',
     lastMaintenance: '2024-08-20',
     readings: [
-      { label: 'Son Okuma', value: '45.8', unit: 'm³/h' },
+      { label: t('lastReading'), value: '45.8', unit: 'm³/h' },
       { label: 'Günlük Tüketim', value: '892', unit: 'm³' },
     ],
     alerts: 3
@@ -345,7 +345,7 @@ const mockDevices: Device[] = [
     installDate: '2024-01-25',
     lastMaintenance: '2024-11-28',
     readings: [
-      { label: 'Son Okuma', value: '156.2', unit: 'kW' },
+      { label: t('lastReading'), value: '156.2', unit: 'kW' },
     ],
     alerts: 1
   },
@@ -355,7 +355,7 @@ const mockDevices: Device[] = [
     name: 'Akım Sensörü - Hat 1',
     type: 'smart_sensor',
     status: 'online',
-    location: 'Elektrik Panosu',
+    location: t('locationElectricalPanel'),
     zone: 'Bölge 1',
     lastSeen: '45 saniye önce',
     firmware: 'v1.2.3',
@@ -737,6 +737,9 @@ export function Devices() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [selectedDevices, setSelectedDevices] = useState<Set<string>>(new Set())
 
+  // Mock devices with translations
+  const mockDevices = useMemo(() => getMockDevices(t), [t, language])
+
   // Device type info with translated labels
   const deviceTypeInfo = useMemo(() => ({
     energy_meter: { label: t('energyMeter'), icon: Zap, color: 'text-foreground', bgColor: 'bg-muted' },
@@ -754,7 +757,7 @@ export function Devices() {
   const zones = useMemo(() => {
     const zoneSet = new Set(mockDevices.map(d => d.zone))
     return Array.from(zoneSet).sort()
-  }, [])
+  }, [mockDevices])
 
   // Filter and sort devices
   const filteredDevices = useMemo(() => {
@@ -807,7 +810,7 @@ export function Devices() {
     })
 
     return filtered
-  }, [searchQuery, selectedType, selectedStatus, selectedZone, sortField, sortOrder])
+  }, [mockDevices, searchQuery, selectedType, selectedStatus, selectedZone, sortField, sortOrder])
 
   // Stats
   const stats = useMemo(() => ({
@@ -817,7 +820,7 @@ export function Devices() {
     warning: mockDevices.filter(d => d.status === 'warning').length,
     maintenance: mockDevices.filter(d => d.status === 'maintenance').length,
     alerts: mockDevices.reduce((sum, d) => sum + d.alerts, 0),
-  }), [])
+  }), [mockDevices])
 
   const handleDeviceClick = (device: Device) => {
     setSelectedDevice(device)

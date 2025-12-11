@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+﻿import { useState, useEffect, useMemo } from "react"
 import { useLanguage } from "@/lib/i18n"
 import {
   Battery,
@@ -75,28 +75,28 @@ const moduller = [
   { id: "MOD-C2", voltaj: 52.0, akim: 27.2, sicaklik: 32, saglik: 96, durum: "aktif" },
 ]
 
-// Enerji kaynakları dağılımı
-const energySourceDistribution = [
-  { name: "Güneş Enerjisi", value: 65, color: "#f59e0b" },
-  { name: "Şebeke", value: 25, color: "#3b82f6" },
-  { name: "Rüzgar", value: 10, color: "#22c55e" },
-]
-
-const chartConfig = {
-  sarj: {
-    label: "Şarj (kW)",
-    color: "#22c55e",
-  },
-  desarj: {
-    label: "Deşarj (kW)",
-    color: "#ef4444",
-  },
-} satisfies ChartConfig
-
 export default function BatteryPage() {
   const { t, language } = useLanguage()
   const [currentTime, setCurrentTime] = useState(new Date())
   const currentCharge = 78
+
+  // Dinamik çeviri gerektiren veriler
+  const energySourceDistribution = useMemo(() => [
+    { name: t("solarEnergySource"), value: 65, color: "#f59e0b" },
+    { name: t("gridSource"), value: 25, color: "#3b82f6" },
+    { name: t("windSource"), value: 10, color: "#22c55e" },
+  ], [t])
+
+  const chartConfig = useMemo(() => ({
+    sarj: {
+      label: t("chargeKw"),
+      color: "#22c55e",
+    },
+    desarj: {
+      label: t("dischargeKw"),
+      color: "#ef4444",
+    },
+  }) satisfies ChartConfig, [t])
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)

@@ -1,18 +1,18 @@
 ﻿import { ProfessionalBarChart } from '@/components/ui/professional-charts'
 import { useLanguage } from '@/lib/i18n'
 
-const data = [
-  { name: 'Pzt', solar: 320, elektrik: 480 },
-  { name: 'Sal', solar: 285, elektrik: 510 },
-  { name: 'Car', solar: 340, elektrik: 470 },
-  { name: 'Per', solar: 310, elektrik: 520 },
-  { name: 'Cum', solar: 295, elektrik: 540 },
-  { name: 'Cmt', solar: 265, elektrik: 380 },
-  { name: 'Paz', solar: 245, elektrik: 350 },
-]
-
 export function Overview() {
   const { t } = useLanguage()
+  
+  const data = [
+    { name: t('monday'), solar: 320, elektrik: 480 },
+    { name: t('tuesday'), solar: 285, elektrik: 510 },
+    { name: t('wednesday'), solar: 340, elektrik: 470 },
+    { name: t('thursday'), solar: 310, elektrik: 520 },
+    { name: t('friday'), solar: 295, elektrik: 540 },
+    { name: t('saturday'), solar: 265, elektrik: 380 },
+    { name: t('sunday'), solar: 245, elektrik: 350 },
+  ]
   
   return (
     <ProfessionalBarChart

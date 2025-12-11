@@ -3,7 +3,10 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, Environment, Html, Sky, Sparkles, ContactShadows } from '@react-three/drei'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sun, Zap, Factory, Activity, Gauge, Thermometer, Flame, Droplets, Wind, Cpu, Container } from 'lucide-react'
+import { Sun, Zap, Factory, Activity, Gauge, Thermometer, Flame, Droplets, Wind, Cpu, Container, Map } from 'lucide-react'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { useLanguage } from '@/lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/map/')({
   component: MapPage,
@@ -470,16 +473,27 @@ function Scene() {
 }
 
 // ==================== ANA SAYFA ====================
-export default function MapPage() {
+function MapPage() {
+  const { t } = useLanguage()
+  
   return (
-    <div className="flex h-[calc(100vh-4rem)] gap-4 p-4">
+    <>
+      <Header>
+        <div className="flex items-center gap-2">
+          <Map className="h-6 w-6 text-blue-500" />
+          <h1 className="text-xl font-semibold">{t('facilityMap')}</h1>
+        </div>
+      </Header>
+
+      <Main>
+        <div className="flex h-full gap-4">
       <div className="flex w-80 flex-col gap-3 overflow-y-auto">
         <div className="grid grid-cols-2 gap-2">
           {[
-            { icon: Zap, label: 'Toplam Tüketim', value: '5.2 MW', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-            { icon: Sun, label: 'GES Üretimi', value: '1.1 MW', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-            { icon: Flame, label: 'Doğalgaz', value: '480 m³/h', color: 'text-orange-400', bg: 'bg-orange-500/10' },
-            { icon: Droplets, label: 'Su', value: '44 m³/h', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+            { icon: Zap, label: t('totalConsumption'), value: '5.2 MW', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+            { icon: Sun, label: t('solarProduction'), value: '1.1 MW', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+            { icon: Flame, label: t('naturalGas'), value: '480 m³/h', color: 'text-orange-400', bg: 'bg-orange-500/10' },
+            { icon: Droplets, label: t('water'), value: '44 m³/h', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
           ].map((item, i) => (
             <Card key={i} className="border-slate-700 bg-slate-900/80 p-3">
               <div className="flex items-center gap-2">
@@ -526,7 +540,7 @@ export default function MapPage() {
         </Card>
 
         <Card className="border-slate-700 bg-slate-900/80 p-3">
-          <div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold text-white">Altyapı Sistemleri</span><Badge variant="secondary" className="text-[10px]">4 Sistem</Badge></div>
+          <div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold text-white">{t('infrastructureSystems')}</span><Badge variant="secondary" className="text-[10px]">4 {t('systems')}</Badge></div>
           <div className="space-y-1.5">
             {[
               { name: 'Trafo Merkezi', icon: Zap, detail: '3 Trafo • 5 OG Hücre', value: '7.2 MVA', color: 'text-purple-400' },
@@ -543,7 +557,7 @@ export default function MapPage() {
         </Card>
 
         <Card className="border-slate-700 bg-slate-900/80 p-3">
-          <div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold text-white">Veri Noktaları</span><Badge variant="secondary" className="text-[10px]">78 Aktif</Badge></div>
+          <div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold text-white">{t('dataPoints')}</span><Badge variant="secondary" className="text-[10px]">78 {t('active')}</Badge></div>
           <div className="grid grid-cols-2 gap-2 text-[10px]">
             {[
               { icon: Zap, label: 'Elektrik Panoları', count: 18 },
@@ -567,6 +581,8 @@ export default function MapPage() {
       <Card className="flex-1 overflow-hidden border-slate-700 bg-slate-950">
         <Canvas shadows><Scene /></Canvas>
       </Card>
-    </div>
+        </div>
+      </Main>
+    </>
   )
 }

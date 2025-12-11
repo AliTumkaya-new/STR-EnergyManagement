@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   Activity, Zap, Wifi, WifiOff, 
   AlertCircle, CheckCircle2, AlertTriangle, Info, Search, 
@@ -89,195 +89,6 @@ type EventType = 'all' | 'info' | 'success' | 'warning' | 'error'
 type EnergyTab = 'electricity' | 'gas' | 'solar' | 'water'
 
 // ============================================
-// TRANSLATIONS
-// ============================================
-
-const liveTranslations = {
-  tr: {
-    title: 'Canlı İzleme',
-    subtitle: 'Anlık enerji değerleri ve register verileri',
-    connected: 'Bağlı',
-    disconnected: 'Bağlantı Kesildi',
-    refresh: 'Yenile',
-    lastUpdate: 'Son güncelleme',
-    secondsAgo: 'sn önce',
-    
-    // Tabs
-    electricity: 'Elektrik',
-    gas: 'Doğalgaz',
-    solar: 'Güneş Enerjisi',
-    water: 'Su',
-    
-    // Electricity
-    phaseData: 'Faz Verileri',
-    phase: 'Faz',
-    voltage: 'Voltaj',
-    current: 'Akım',
-    power: 'Güç',
-    powerFactor: 'Güç Faktörü',
-    frequency: 'Frekans',
-    totalPower: 'Toplam Güç',
-    totalEnergy: 'Toplam Enerji',
-    threePhase: '3 Fazlı Sistem',
-    
-    // Gas
-    gasFlow: 'Anlık Debi',
-    gasPressure: 'Basınç',
-    gasTemperature: 'Sıcaklık',
-    totalVolume: 'Toplam Hacim',
-    gasMetering: 'Doğalgaz Sayacı',
-    
-    // Solar
-    dcSide: 'DC Tarafı',
-    acSide: 'AC Tarafı',
-    dcVoltage: 'DC Voltaj',
-    dcCurrent: 'DC Akım',
-    dcPower: 'DC Güç',
-    acVoltage: 'AC Voltaj',
-    acCurrent: 'AC Akım',
-    acPower: 'AC Güç',
-    efficiency: 'Verimlilik',
-    inverterTemp: 'İnverter Sıcaklığı',
-    stringData: 'String Verileri',
-    string: 'String',
-    solarProduction: 'Güneş Paneli Üretimi',
-    
-    // Water
-    waterFlow: 'Anlık Debi',
-    waterPressure: 'Basınç',
-    waterTemperature: 'Sıcaklık',
-    waterVolume: 'Toplam Tüketim',
-    phLevel: 'pH Seviyesi',
-    waterMetering: 'Su Sayacı',
-    
-    // Registers
-    registerData: 'Register Verileri',
-    address: 'Adres',
-    registerName: 'Register Adı',
-    value: 'Değer',
-    status: 'Durum',
-    normal: 'Normal',
-    warning: 'Uyarı',
-    critical: 'Kritik',
-    
-    // Events
-    liveEvents: 'Anlık Olaylar',
-    events: 'olay',
-    searchPlaceholder: 'Olaylarda ara...',
-    all: 'Tümü',
-    info: 'Bilgi',
-    success: 'Başarı',
-    error: 'Hata',
-    noEvents: 'Olay bulunamadı',
-    
-    // Units
-    kw: 'kW',
-    kwh: 'kWh',
-    v: 'V',
-    a: 'A',
-    hz: 'Hz',
-    celsius: '°C',
-    percent: '%',
-    m3h: 'm³/h',
-    m3: 'm³',
-    bar: 'bar',
-    lh: 'L/h',
-    l: 'L',
-  },
-  en: {
-    title: 'Live Monitoring',
-    subtitle: 'Real-time energy values and register data',
-    connected: 'Connected',
-    disconnected: 'Disconnected',
-    refresh: 'Refresh',
-    lastUpdate: 'Last update',
-    secondsAgo: 'sec ago',
-    
-    // Tabs
-    electricity: 'Electricity',
-    gas: 'Natural Gas',
-    solar: 'Solar Energy',
-    water: 'Water',
-    
-    // Electricity
-    phaseData: 'Phase Data',
-    phase: 'Phase',
-    voltage: 'Voltage',
-    current: 'Current',
-    power: 'Power',
-    powerFactor: 'Power Factor',
-    frequency: 'Frequency',
-    totalPower: 'Total Power',
-    totalEnergy: 'Total Energy',
-    threePhase: '3-Phase System',
-    
-    // Gas
-    gasFlow: 'Flow Rate',
-    gasPressure: 'Pressure',
-    gasTemperature: 'Temperature',
-    totalVolume: 'Total Volume',
-    gasMetering: 'Gas Meter',
-    
-    // Solar
-    dcSide: 'DC Side',
-    acSide: 'AC Side',
-    dcVoltage: 'DC Voltage',
-    dcCurrent: 'DC Current',
-    dcPower: 'DC Power',
-    acVoltage: 'AC Voltage',
-    acCurrent: 'AC Current',
-    acPower: 'AC Power',
-    efficiency: 'Efficiency',
-    inverterTemp: 'Inverter Temp',
-    stringData: 'String Data',
-    string: 'String',
-    solarProduction: 'Solar Panel Production',
-    
-    // Water
-    waterFlow: 'Flow Rate',
-    waterPressure: 'Pressure',
-    waterTemperature: 'Temperature',
-    waterVolume: 'Total Consumption',
-    phLevel: 'pH Level',
-    waterMetering: 'Water Meter',
-    
-    // Registers
-    registerData: 'Register Data',
-    address: 'Address',
-    registerName: 'Register Name',
-    value: 'Value',
-    status: 'Status',
-    normal: 'Normal',
-    warning: 'Warning',
-    critical: 'Critical',
-    
-    // Events
-    liveEvents: 'Live Events',
-    events: 'events',
-    searchPlaceholder: 'Search events...',
-    all: 'All',
-    info: 'Info',
-    success: 'Success',
-    error: 'Error',
-    noEvents: 'No events found',
-    
-    // Units
-    kw: 'kW',
-    kwh: 'kWh',
-    v: 'V',
-    a: 'A',
-    hz: 'Hz',
-    celsius: '°C',
-    percent: '%',
-    m3h: 'm³/h',
-    m3: 'm³',
-    bar: 'bar',
-    lh: 'L/h',
-    l: 'L',
-  }
-}
-
-// ============================================
 // DATA GENERATORS
 // ============================================
 
@@ -323,11 +134,11 @@ const generateGasData = (): GasData => {
     temperature,
     totalVolume: 8542 + Math.random() * 10,
     registers: [
-      { address: '0x1000', name: 'Flow Rate', value: flow, unit: 'm³/h', status: 'normal', lastUpdate: new Date() },
+      { address: '0x1000', name: 'Flow Rate', value: flow, unit: 'm�/h', status: 'normal', lastUpdate: new Date() },
       { address: '0x1002', name: 'Pressure', value: pressure, unit: 'bar', status: pressure < 0.5 ? 'warning' : 'normal', lastUpdate: new Date() },
-      { address: '0x1004', name: 'Temperature', value: temperature, unit: '°C', status: 'normal', lastUpdate: new Date() },
-      { address: '0x1006', name: 'Total Volume', value: 8542 + Math.random() * 10, unit: 'm³', status: 'normal', lastUpdate: new Date() },
-      { address: '0x1008', name: 'Daily Volume', value: 45 + Math.random() * 10, unit: 'm³', status: 'normal', lastUpdate: new Date() },
+      { address: '0x1004', name: 'Temperature', value: temperature, unit: '�C', status: 'normal', lastUpdate: new Date() },
+      { address: '0x1006', name: 'Total Volume', value: 8542 + Math.random() * 10, unit: 'm�', status: 'normal', lastUpdate: new Date() },
+      { address: '0x1008', name: 'Daily Volume', value: 45 + Math.random() * 10, unit: 'm�', status: 'normal', lastUpdate: new Date() },
       { address: '0x100A', name: 'Valve Status', value: 1, unit: '', status: 'normal', lastUpdate: new Date() },
     ]
   }
@@ -371,7 +182,7 @@ const generateSolarData = (): SolarData => {
       { address: '0x2008', name: 'AC Current', value: acCurrent, unit: 'A', status: 'normal', lastUpdate: new Date() },
       { address: '0x200A', name: 'AC Power', value: acPower, unit: 'kW', status: 'normal', lastUpdate: new Date() },
       { address: '0x200C', name: 'Efficiency', value: efficiency * 100, unit: '%', status: 'normal', lastUpdate: new Date() },
-      { address: '0x200E', name: 'Inverter Temp', value: 35 + Math.random() * 15, unit: '°C', status: (35 + Math.random() * 15) > 45 ? 'warning' : 'normal', lastUpdate: new Date() },
+      { address: '0x200E', name: 'Inverter Temp', value: 35 + Math.random() * 15, unit: '�C', status: (35 + Math.random() * 15) > 45 ? 'warning' : 'normal', lastUpdate: new Date() },
       { address: '0x2010', name: 'String 1 Voltage', value: strings[0].voltage, unit: 'V', status: 'normal', lastUpdate: new Date() },
       { address: '0x2012', name: 'String 2 Voltage', value: strings[1].voltage, unit: 'V', status: 'normal', lastUpdate: new Date() },
       { address: '0x2014', name: 'String 3 Voltage', value: strings[2].voltage, unit: 'V', status: 'normal', lastUpdate: new Date() },
@@ -395,7 +206,7 @@ const generateWaterData = (): WaterData => {
     registers: [
       { address: '0x3000', name: 'Flow Rate', value: flow, unit: 'L/h', status: 'normal', lastUpdate: new Date() },
       { address: '0x3002', name: 'Pressure', value: pressure, unit: 'bar', status: pressure < 1.5 ? 'warning' : 'normal', lastUpdate: new Date() },
-      { address: '0x3004', name: 'Temperature', value: temperature, unit: '°C', status: 'normal', lastUpdate: new Date() },
+      { address: '0x3004', name: 'Temperature', value: temperature, unit: '�C', status: 'normal', lastUpdate: new Date() },
       { address: '0x3006', name: 'Total Volume', value: 125840 + Math.random() * 100, unit: 'L', status: 'normal', lastUpdate: new Date() },
       { address: '0x3008', name: 'pH Level', value: ph, unit: '', status: ph < 6.5 || ph > 7.5 ? 'warning' : 'normal', lastUpdate: new Date() },
       { address: '0x300A', name: 'Daily Volume', value: 850 + Math.random() * 100, unit: 'L', status: 'normal', lastUpdate: new Date() },
@@ -408,7 +219,7 @@ const generateWaterData = (): WaterData => {
 // ============================================
 
 // Connection Status
-const ConnectionStatus = ({ isConnected, t }: { isConnected: boolean, t: typeof liveTranslations['tr'] }) => (
+const ConnectionStatus = ({ isConnected, t }: { isConnected: boolean, t: any }) => (
   <div className={cn(
     "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-sm",
     isConnected 
@@ -424,12 +235,12 @@ const ConnectionStatus = ({ isConnected, t }: { isConnected: boolean, t: typeof 
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
         </div>
-        <span className="font-medium text-emerald-700 dark:text-emerald-400">{t.connected}</span>
+        <span className="font-medium text-emerald-700 dark:text-emerald-400">{t('connected')}</span>
       </>
     ) : (
       <>
         <WifiOff className="h-4 w-4 text-red-600 dark:text-red-400" />
-        <span className="font-medium text-red-700 dark:text-red-400">{t.disconnected}</span>
+        <span className="font-medium text-red-700 dark:text-red-400">{t('disconnected')}</span>
       </>
     )}
   </div>
@@ -490,35 +301,35 @@ const LiveValue = ({
 }
 
 // Phase Card
-const PhaseCard = ({ phase, t }: { phase: PhaseData, t: typeof liveTranslations['tr'] }) => (
+const PhaseCard = ({ phase, t }: { phase: PhaseData, t: any }) => (
   <Card className="overflow-hidden">
     <CardHeader className="pb-2 bg-gradient-to-r from-blue-500/10 to-transparent">
       <CardTitle className="text-lg flex items-center gap-2">
         <Zap className="h-5 w-5 text-blue-500" />
-        {t.phase} {phase.phase}
+        {t('phase')} {phase.phase}
       </CardTitle>
     </CardHeader>
     <CardContent className="pt-4 space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="p-3 rounded-lg bg-muted/50">
-          <p className="text-xs text-muted-foreground">{t.voltage}</p>
+          <p className="text-xs text-muted-foreground">{t('voltage')}</p>
           <p className="text-lg font-bold tabular-nums">{phase.voltage.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">V</span></p>
         </div>
         <div className="p-3 rounded-lg bg-muted/50">
-          <p className="text-xs text-muted-foreground">{t.current}</p>
+          <p className="text-xs text-muted-foreground">{t('current')}</p>
           <p className="text-lg font-bold tabular-nums">{phase.current.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">A</span></p>
         </div>
         <div className="p-3 rounded-lg bg-muted/50">
-          <p className="text-xs text-muted-foreground">{t.power}</p>
+          <p className="text-xs text-muted-foreground">{t('power')}</p>
           <p className="text-lg font-bold tabular-nums">{phase.power.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">kW</span></p>
         </div>
         <div className="p-3 rounded-lg bg-muted/50">
-          <p className="text-xs text-muted-foreground">{t.powerFactor}</p>
+          <p className="text-xs text-muted-foreground">{t('powerFactor')}</p>
           <p className="text-lg font-bold tabular-nums">{phase.powerFactor.toFixed(3)}</p>
         </div>
       </div>
       <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-        <p className="text-xs text-blue-600 dark:text-blue-400">{t.frequency}</p>
+        <p className="text-xs text-blue-600 dark:text-blue-400">{t('frequency')}</p>
         <p className="text-lg font-bold tabular-nums text-blue-700 dark:text-blue-300">{phase.frequency.toFixed(2)} <span className="text-sm font-normal">Hz</span></p>
       </div>
     </CardContent>
@@ -526,24 +337,24 @@ const PhaseCard = ({ phase, t }: { phase: PhaseData, t: typeof liveTranslations[
 )
 
 // Register Table
-const RegisterTable = ({ registers, t }: { registers: RegisterData[], t: typeof liveTranslations['tr'] }) => (
+const RegisterTable = ({ registers, t }: { registers: RegisterData[], t: any }) => (
   <Card>
     <CardHeader className="pb-3">
       <CardTitle className="text-lg flex items-center gap-2">
         <Gauge className="h-5 w-5" />
-        {t.registerData}
+        {t('registerData')}
       </CardTitle>
-      <CardDescription>Modbus Register Değerleri</CardDescription>
+      <CardDescription>Modbus Register De�erleri</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
-              <th className="text-left py-2 px-3 font-medium text-muted-foreground">{t.address}</th>
-              <th className="text-left py-2 px-3 font-medium text-muted-foreground">{t.registerName}</th>
-              <th className="text-right py-2 px-3 font-medium text-muted-foreground">{t.value}</th>
-              <th className="text-center py-2 px-3 font-medium text-muted-foreground">{t.status}</th>
+              <th className="text-left py-2 px-3 font-medium text-muted-foreground">{t('address')}</th>
+              <th className="text-left py-2 px-3 font-medium text-muted-foreground">{t('registerName')}</th>
+              <th className="text-right py-2 px-3 font-medium text-muted-foreground">{t('value')}</th>
+              <th className="text-center py-2 px-3 font-medium text-muted-foreground">{t('status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -561,7 +372,7 @@ const RegisterTable = ({ registers, t }: { registers: RegisterData[], t: typeof 
                     reg.status === 'normal' && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
                     reg.status === 'warning' && "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
                   )}>
-                    {t[reg.status]}
+                    {t(reg.status)}
                   </Badge>
                 </td>
               </tr>
@@ -574,10 +385,10 @@ const RegisterTable = ({ registers, t }: { registers: RegisterData[], t: typeof 
 )
 
 // String Data Card (Solar)
-const StringCard = ({ stringData, t }: { stringData: SolarData['strings'][0], t: typeof liveTranslations['tr'] }) => (
+const StringCard = ({ stringData, t }: { stringData: SolarData['strings'][0], t: any }) => (
   <div className="p-4 rounded-xl border bg-card">
     <div className="flex items-center justify-between mb-3">
-      <span className="font-medium">{t.string} {stringData.id}</span>
+      <span className="font-medium">{t('string')} {stringData.id}</span>
       <CircleDot className="h-2 w-2 text-emerald-500 animate-pulse" />
     </div>
     <div className="grid grid-cols-3 gap-2 text-sm">
@@ -598,7 +409,7 @@ const StringCard = ({ stringData, t }: { stringData: SolarData['strings'][0], t:
 )
 
 // Event Badge
-const EventBadge = ({ type, lang }: { type: EventItem['type'], lang: 'tr' | 'en' }) => {
+const EventBadge = ({ type, t }: { type: EventItem['type'], t: any }) => {
   const config = {
     info: { icon: Info, className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400' },
     success: { icon: CheckCircle2, className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' },
@@ -611,7 +422,7 @@ const EventBadge = ({ type, lang }: { type: EventItem['type'], lang: 'tr' | 'en'
   return (
     <div className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium', className)}>
       <EventIcon className="h-3 w-3" />
-      {liveTranslations[lang][type]}
+      {t(type)}
     </div>
   )
 }
@@ -621,8 +432,7 @@ const EventBadge = ({ type, lang }: { type: EventItem['type'], lang: 'tr' | 'en'
 // ============================================
 
 export function LiveMonitoring() {
-  const { language } = useLanguage()
-  const t = liveTranslations[language]
+  const { t, language } = useLanguage()
   
   const [activeTab, setActiveTab] = useState<EnergyTab>('electricity')
   const [isConnected, setIsConnected] = useState(true)
@@ -642,9 +452,9 @@ export function LiveMonitoring() {
   // Initialize
   useEffect(() => {
     const initialEvents: EventItem[] = [
-      { id: '1', type: 'success', message: language === 'tr' ? 'Elektrik sayacı bağlantısı başarılı' : 'Electricity meter connected', source: 'Electricity', timestamp: new Date(Date.now() - 60000) },
-      { id: '2', type: 'info', message: language === 'tr' ? 'Güneş paneli üretimi optimum seviyede' : 'Solar panel production at optimum', source: 'Solar', timestamp: new Date(Date.now() - 120000) },
-      { id: '3', type: 'warning', message: language === 'tr' ? 'Doğalgaz basıncı düşük' : 'Natural gas pressure low', source: 'Gas', timestamp: new Date(Date.now() - 180000) },
+      { id: '1', type: 'success', message: language === 'tr' ? 'Elektrik sayac� ba�lant�s� ba�ar�l�' : 'Electricity meter connected', source: 'Electricity', timestamp: new Date(Date.now() - 60000) },
+      { id: '2', type: 'info', message: language === 'tr' ? 'G�ne� paneli �retimi optimum seviyede' : 'Solar panel production at optimum', source: 'Solar', timestamp: new Date(Date.now() - 120000) },
+      { id: '3', type: 'warning', message: language === 'tr' ? 'Do�algaz bas�nc� d���k' : 'Natural gas pressure low', source: 'Gas', timestamp: new Date(Date.now() - 180000) },
     ]
     setEvents(initialEvents)
 
@@ -728,18 +538,18 @@ export function LiveMonitoring() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t.title}</h1>
-          <p className="text-muted-foreground mt-1">{t.subtitle}</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t('liveMonitoringTitle')}</h1>
+          <p className="text-muted-foreground mt-1">{t('liveMonitoringSubtitle')}</p>
         </div>
         
         <div className="flex items-center gap-3">
           <ConnectionStatus isConnected={isConnected} t={t} />
           <div className="text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full tabular-nums">
-            {t.lastUpdate}: {lastUpdate} {t.secondsAgo}
+            {t('lastUpdate')}: {lastUpdate} {t('secondsAgo')}
           </div>
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
             <RefreshCw className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")} />
-            {t.refresh}
+            {t('refresh')}
           </Button>
         </div>
       </div>
@@ -749,19 +559,19 @@ export function LiveMonitoring() {
         <TabsList className="grid w-full grid-cols-4 h-auto p-1">
           <TabsTrigger value="electricity" className="flex items-center gap-2 py-2.5">
             <Zap className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.electricity}</span>
+            <span className="hidden sm:inline">{t('electricity')}</span>
           </TabsTrigger>
           <TabsTrigger value="gas" className="flex items-center gap-2 py-2.5">
             <Flame className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.gas}</span>
+            <span className="hidden sm:inline">{t('gas')}</span>
           </TabsTrigger>
           <TabsTrigger value="solar" className="flex items-center gap-2 py-2.5">
             <Sun className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.solar}</span>
+            <span className="hidden sm:inline">{t('solar')}</span>
           </TabsTrigger>
           <TabsTrigger value="water" className="flex items-center gap-2 py-2.5">
             <Droplets className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.water}</span>
+            <span className="hidden sm:inline">{t('water')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -772,17 +582,17 @@ export function LiveMonitoring() {
               {/* Summary Cards */}
               <div className="grid gap-4 md:grid-cols-2">
                 <LiveValue 
-                  label={t.totalPower} 
+                  label={t('totalPower')} 
                   value={electricityData.totalPower} 
-                  unit={t.kw}
+                  unit={t('kw')}
                   icon={Zap}
                   color="blue"
                   size="large"
                 />
                 <LiveValue 
-                  label={t.totalEnergy} 
+                  label={t('totalEnergy')} 
                   value={electricityData.totalEnergy} 
-                  unit={t.kwh}
+                  unit={t('kwh')}
                   icon={Activity}
                   color="green"
                   size="large"
@@ -793,7 +603,7 @@ export function LiveMonitoring() {
               <div>
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Power className="h-5 w-5" />
-                  {t.phaseData} - {t.threePhase}
+                  {t('phaseData')} - {t('threePhaseSystem')}
                 </h3>
                 <div className="grid gap-4 md:grid-cols-3">
                   {electricityData.phases.map((phase) => (
@@ -816,15 +626,15 @@ export function LiveMonitoring() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Flame className="h-5 w-5 text-orange-500" />
-                    {t.gasMetering}
+                    {t('gasMetering')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-4">
-                    <LiveValue label={t.gasFlow} value={gasData.flow} unit={t.m3h} icon={Waves} color="amber" />
-                    <LiveValue label={t.gasPressure} value={gasData.pressure} unit={t.bar} icon={Gauge} color="blue" />
-                    <LiveValue label={t.gasTemperature} value={gasData.temperature} unit={t.celsius} icon={ThermometerSun} color="red" />
-                    <LiveValue label={t.totalVolume} value={gasData.totalVolume} unit={t.m3} icon={Activity} color="green" />
+                    <LiveValue label={t('gasFlow')} value={gasData.flow} unit={t('m3h')} icon={Waves} color="amber" />
+                    <LiveValue label={t('gasPressure')} value={gasData.pressure} unit={t('bar')} icon={Gauge} color="blue" />
+                    <LiveValue label={t('gasTemperature')} value={gasData.temperature} unit={t('celsius')} icon={ThermometerSun} color="red" />
+                    <LiveValue label={t('totalVolume')} value={gasData.totalVolume} unit={t('m3')} icon={Activity} color="green" />
                   </div>
                 </CardContent>
               </Card>
@@ -844,13 +654,13 @@ export function LiveMonitoring() {
                   <CardHeader className="bg-gradient-to-r from-amber-500/10 to-transparent">
                     <CardTitle className="flex items-center gap-2">
                       <Sun className="h-5 w-5 text-amber-500" />
-                      {t.dcSide}
+                      {t('dcSide')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-4 space-y-3">
-                    <LiveValue label={t.dcVoltage} value={solarData.dcVoltage} unit={t.v} color="amber" />
-                    <LiveValue label={t.dcCurrent} value={solarData.dcCurrent} unit={t.a} color="amber" />
-                    <LiveValue label={t.dcPower} value={solarData.dcPower} unit={t.kw} color="amber" />
+                    <LiveValue label={t('dcVoltage')} value={solarData.dcVoltage} unit={t('v')} color="amber" />
+                    <LiveValue label={t('dcCurrent')} value={solarData.dcCurrent} unit={t('a')} color="amber" />
+                    <LiveValue label={t('dcPower')} value={solarData.dcPower} unit={t('kw')} color="amber" />
                   </CardContent>
                 </Card>
                 
@@ -859,27 +669,27 @@ export function LiveMonitoring() {
                   <CardHeader className="bg-gradient-to-r from-blue-500/10 to-transparent">
                     <CardTitle className="flex items-center gap-2">
                       <Plug className="h-5 w-5 text-blue-500" />
-                      {t.acSide}
+                      {t('acSide')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-4 space-y-3">
-                    <LiveValue label={t.acVoltage} value={solarData.acVoltage} unit={t.v} color="blue" />
-                    <LiveValue label={t.acCurrent} value={solarData.acCurrent} unit={t.a} color="blue" />
-                    <LiveValue label={t.acPower} value={solarData.acPower} unit={t.kw} color="blue" />
+                    <LiveValue label={t('acVoltage')} value={solarData.acVoltage} unit={t('v')} color="blue" />
+                    <LiveValue label={t('acCurrent')} value={solarData.acCurrent} unit={t('a')} color="blue" />
+                    <LiveValue label={t('acPower')} value={solarData.acPower} unit={t('kw')} color="blue" />
                   </CardContent>
                 </Card>
               </div>
               
               {/* Efficiency & Temp */}
               <div className="grid gap-4 md:grid-cols-2">
-                <LiveValue label={t.efficiency} value={solarData.efficiency} unit={t.percent} icon={Activity} color="green" size="large" />
-                <LiveValue label={t.inverterTemp} value={solarData.temperature} unit={t.celsius} icon={ThermometerSun} color={solarData.temperature > 45 ? 'red' : 'green'} size="large" />
+                <LiveValue label={t('efficiency')} value={solarData.efficiency} unit={t('percent')} icon={Activity} color="green" size="large" />
+                <LiveValue label={t('inverterTemp')} value={solarData.temperature} unit={t('celsius')} icon={ThermometerSun} color={solarData.temperature > 45 ? 'red' : 'green'} size="large" />
               </div>
               
               {/* String Data */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{t.stringData}</CardTitle>
+                  <CardTitle>{t('stringData')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-4">
@@ -903,16 +713,16 @@ export function LiveMonitoring() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Droplets className="h-5 w-5 text-blue-500" />
-                    {t.waterMetering}
+                    {t('waterMetering')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-5">
-                    <LiveValue label={t.waterFlow} value={waterData.flow} unit={t.lh} icon={Waves} color="blue" />
-                    <LiveValue label={t.waterPressure} value={waterData.pressure} unit={t.bar} icon={Gauge} color="blue" />
-                    <LiveValue label={t.waterTemperature} value={waterData.temperature} unit={t.celsius} icon={ThermometerSun} color="blue" />
-                    <LiveValue label={t.waterVolume} value={waterData.totalVolume} unit={t.l} icon={Activity} color="green" />
-                    <LiveValue label={t.phLevel} value={waterData.ph} unit="" icon={Droplets} color={waterData.ph < 6.5 || waterData.ph > 7.5 ? 'amber' : 'green'} />
+                    <LiveValue label={t('waterFlow')} value={waterData.flow} unit={t('lh')} icon={Waves} color="blue" />
+                    <LiveValue label={t('waterPressure')} value={waterData.pressure} unit={t('bar')} icon={Gauge} color="blue" />
+                    <LiveValue label={t('waterTemperature')} value={waterData.temperature} unit={t('celsius')} icon={ThermometerSun} color="blue" />
+                    <LiveValue label={t('waterVolume')} value={waterData.totalVolume} unit={t('l')} icon={Activity} color="green" />
+                    <LiveValue label={t('phLevel')} value={waterData.ph} unit="" icon={Droplets} color={waterData.ph < 6.5 || waterData.ph > 7.5 ? 'amber' : 'green'} />
                   </div>
                 </CardContent>
               </Card>
@@ -929,15 +739,15 @@ export function LiveMonitoring() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
-                {t.liveEvents}
-                <Badge variant="secondary">{filteredEvents.length} {t.events}</Badge>
+                {t('liveEvents')}
+                <Badge variant="secondary">{filteredEvents.length} {t('events')}</Badge>
               </CardTitle>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative flex-1 min-w-[180px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder={t.searchPlaceholder} 
+                  placeholder={t('searchPlaceholder')} 
                   value={searchQuery} 
                   onChange={(e) => setSearchQuery(e.target.value)} 
                   className="pl-9 h-9" 
@@ -949,11 +759,11 @@ export function LiveMonitoring() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t.all}</SelectItem>
-                  <SelectItem value="info">{t.info}</SelectItem>
-                  <SelectItem value="success">{t.success}</SelectItem>
-                  <SelectItem value="warning">{t.warning}</SelectItem>
-                  <SelectItem value="error">{t.error}</SelectItem>
+                  <SelectItem value="all">{t('all')}</SelectItem>
+                  <SelectItem value="info">{t('info')}</SelectItem>
+                  <SelectItem value="success">{t('success')}</SelectItem>
+                  <SelectItem value="warning">{t('warning')}</SelectItem>
+                  <SelectItem value="error">{t('error')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -964,7 +774,7 @@ export function LiveMonitoring() {
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
                 <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                  <EventBadge type={event.type} lang={language} />
+                  <EventBadge type={event.type} t={t} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm">{event.message}</p>
                     <p className="text-xs text-muted-foreground">{event.source}</p>
@@ -978,7 +788,7 @@ export function LiveMonitoring() {
             ) : (
               <div className="text-center py-6 text-muted-foreground">
                 <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                <p>{t.noEvents}</p>
+                <p>{t('noEvents')}</p>
               </div>
             )}
           </div>

@@ -32,7 +32,7 @@ export function LoadingScreen({ isLoading = true }: LoadingScreenProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Blurlu arka plan */}
-      <div className="absolute inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-white/30 dark:bg-zinc-950/30 backdrop-blur-md" />
 
       {/* 3D Logo */}
       <div 

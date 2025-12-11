@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+﻿import { useState, useEffect, useMemo } from "react"
 import { useLanguage } from "@/lib/i18n"
 import {
   Sun,
@@ -57,7 +57,7 @@ const hourlyProductionData = [
 const weeklyData = [
   { day: "Pzt", uretim: 320, tuketim: 280 },
   { day: "Sal", uretim: 285, tuketim: 310 },
-  { day: "Çar", uretim: 340, tuketim: 295 },
+  { day: "�ar", uretim: 340, tuketim: 295 },
   { day: "Per", uretim: 310, tuketim: 320 },
   { day: "Cum", uretim: 295, tuketim: 340 },
   { day: "Cmt", uretim: 265, tuketim: 180 },
@@ -75,11 +75,13 @@ const panelData = [
   { id: "B4", verimlilik: 90, sicaklik: 46, durum: "optimal" },
 ]
 
-const energyDistribution = [
-  { name: "Tüketim", value: 65, color: "#3b82f6" },
-  { name: "Bataryaya", value: 20, color: "#22c55e" },
-  { name: "Şebekeye", value: 15, color: "#f59e0b" },
-]
+// Finansal ve Karbon Tasarruf (OpenRemote optimization)
+const savingsData = {
+  financialSaving: 1248.50, // TL
+  carbonSaving: 142.5, // kg CO2
+  gridExportRevenue: 856.20, // TL
+  selfConsumptionRate: 72, // %
+}
 
 // OpenRemote EMS - Sistem Konfigürasyonu
 const systemConfig = {
@@ -90,26 +92,24 @@ const systemConfig = {
   location: { lat: 41.0082, lng: 28.9784 }, // İstanbul
 }
 
-// Tahmin vs Gerçek karşılaştırma (OpenRemote forecast service)
-const forecastAccuracy = [
-  { period: "Bugün", tahmin: 285, gercek: 278, sapma: 2.5 },
-  { period: "Dün", tahmin: 254, gercek: 268, sapma: -5.5 },
-  { period: "2 gün önce", tahmin: 312, gercek: 305, sapma: 2.3 },
-  { period: "3 gün önce", tahmin: 298, gercek: 292, sapma: 2.0 },
-]
-
-// Finansal ve Karbon Tasarruf (OpenRemote optimization)
-const savingsData = {
-  financialSaving: 1248.50, // TL
-  carbonSaving: 142.5, // kg CO2
-  gridExportRevenue: 856.20, // TL
-  selfConsumptionRate: 72, // %
-}
-
 export default function SolarPage() {
   const { t, language } = useLanguage()
   const [currentTime, setCurrentTime] = useState(new Date())
   const [forecastEnabled, setForecastEnabled] = useState(true)
+
+  // Dinamik çeviri gerektiren veriler
+  const energyDistribution = useMemo(() => [
+    { name: t("consumptionValue"), value: 65, color: "#3b82f6" },
+    { name: t("toBattery"), value: 20, color: "#22c55e" },
+    { name: t("toGrid"), value: 15, color: "#f59e0b" },
+  ], [t])
+
+  const forecastAccuracy = useMemo(() => [
+    { period: t("today"), tahmin: 285, gercek: 278, sapma: 2.5 },
+    { period: t("yesterday"), tahmin: 254, gercek: 268, sapma: -5.5 },
+    { period: t("twoDaysAgo"), tahmin: 312, gercek: 305, sapma: 2.3 },
+    { period: t("threeDaysAgo"), tahmin: 298, gercek: 292, sapma: 2.0 },
+  ], [t])
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -202,7 +202,7 @@ export default function SolarPage() {
                   <CloudSun className="h-4 w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">28°C</div>
+                  <div className="text-3xl font-bold">28�C</div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <span>{t('partlyCloudy')}</span>
                   </div>
@@ -310,7 +310,7 @@ export default function SolarPage() {
                   <PanelTop className="h-5 w-5 text-amber-500" />
                   Panel Durumu
                 </CardTitle>
-                <CardDescription>Tüm panellerin anlık durum ve performansı</CardDescription>
+                <CardDescription>T�m panellerin anl�k durum ve performans�</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
@@ -340,8 +340,8 @@ export default function SolarPage() {
                           <span className="font-medium">{panel.verimlilik}%</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">Sıcaklık:</span>
-                          <span className="font-medium">{panel.sicaklik}°C</span>
+                          <span className="text-muted-foreground">S�cakl�k:</span>
+                          <span className="font-medium">{panel.sicaklik}�C</span>
                         </div>
                       </div>
                       <Progress value={panel.verimlilik} className="mt-2 h-1" />
@@ -353,7 +353,7 @@ export default function SolarPage() {
           </TabsContent>
 
           <TabsContent value="forecast" className="space-y-6">
-            {/* Tasarruf Kartları */}
+            {/* Tasarruf Kartlar� */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card className="border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:border-green-800 dark:from-green-950/20 dark:to-emerald-950/20">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -361,7 +361,7 @@ export default function SolarPage() {
                   <DollarSign className="h-4 w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-600">₺{savingsData.financialSaving.toLocaleString()}</div>
+                  <div className="text-3xl font-bold text-green-600">?{savingsData.financialSaving.toLocaleString()}</div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <TrendingUp className="h-3 w-3 text-green-500" />
                     <span>Bu ay optimizasyon tasarrufu</span>
@@ -378,27 +378,27 @@ export default function SolarPage() {
                   <div className="text-3xl font-bold text-emerald-600">{savingsData.carbonSaving} kg</div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <TrendingDown className="h-3 w-3 text-emerald-500" />
-                    <span>CO₂ emisyon azaltımı</span>
+                    <span>CO� emisyon azalt�m�</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Şebeke Satış Geliri</CardTitle>
+                  <CardTitle className="text-sm font-medium">�ebeke Sat�� Geliri</CardTitle>
                   <Zap className="h-4 w-4 text-amber-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">₺{savingsData.gridExportRevenue.toLocaleString()}</div>
+                  <div className="text-3xl font-bold">?{savingsData.gridExportRevenue.toLocaleString()}</div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span>Export tarife geliri</span>
+                    <span>t('exportTariffRevenue')</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Öz Tüketim Oranı</CardTitle>
+                  <CardTitle className="text-sm font-medium">�z T�ketim Oran�</CardTitle>
                   <Activity className="h-4 w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
@@ -408,14 +408,14 @@ export default function SolarPage() {
               </Card>
             </div>
 
-            {/* Tahmin Doğruluğu */}
+            {/* Tahmin Do�rulu�u */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-amber-500" />
-                  Tahmin Servisi Performansı
+                  Tahmin Servisi Performans�
                 </CardTitle>
-                <CardDescription>Forecast.Solar servisi tahmin doğruluğu</CardDescription>
+                <CardDescription>Forecast.Solar servisi tahmin do�rulu�u</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -424,7 +424,7 @@ export default function SolarPage() {
                       <div>
                         <span className="font-medium">{item.period}</span>
                         <div className="text-sm text-muted-foreground mt-1">
-                          Tahmin: {item.tahmin} kWh | Gerçek: {item.gercek} kWh
+                          Tahmin: {item.tahmin} kWh | Ger�ek: {item.gercek} kWh
                         </div>
                       </div>
                       <div className="text-right">
@@ -442,14 +442,14 @@ export default function SolarPage() {
 
           <TabsContent value="settings" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Panel Konfigürasyonu */}
+              {/* Panel Konfig�rasyonu */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5 text-amber-500" />
-                    Panel Konfigürasyonu
+                    Panel Konfig�rasyonu
                   </CardTitle>
-                  <CardDescription>OpenRemote EMS sistem ayarları</CardDescription>
+                  <CardDescription>OpenRemote EMS sistem ayarlar�</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-4 rounded-xl border">
@@ -457,31 +457,31 @@ export default function SolarPage() {
                       <Compass className="h-5 w-5 text-blue-500" />
                       <div>
                         <span className="font-medium">Panel Azimuth</span>
-                        <p className="text-xs text-muted-foreground">Güney yönü = 180°</p>
+                        <p className="text-xs text-muted-foreground">G�ney y�n� = 180�</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-lg">{systemConfig.panelAzimuth}°</Badge>
+                    <Badge variant="outline" className="text-lg">{systemConfig.panelAzimuth}�</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-xl border">
                     <div>
-                      <span className="font-medium">Panel Eğimi (Pitch)</span>
-                      <p className="text-xs text-muted-foreground">Yatay = 0°</p>
+                      <span className="font-medium">Panel E�imi (Pitch)</span>
+                      <p className="text-xs text-muted-foreground">Yatay = 0�</p>
                     </div>
-                    <Badge variant="outline" className="text-lg">{systemConfig.panelPitch}°</Badge>
+                    <Badge variant="outline" className="text-lg">{systemConfig.panelPitch}�</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-xl border">
                     <div>
-                      <span className="font-medium">Panel Yönelimi</span>
-                      <p className="text-xs text-muted-foreground">Tek yön veya Doğu-Batı</p>
+                      <span className="font-medium">Panel Y�nelimi</span>
+                      <p className="text-xs text-muted-foreground">Tek y�n veya Do�u-Bat�</p>
                     </div>
                     <Badge variant="outline">{systemConfig.panelOrientation}</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-xl border">
                     <div>
-                      <span className="font-medium">Maksimum Güç (Peak)</span>
+                      <span className="font-medium">Maksimum G�� (Peak)</span>
                       <p className="text-xs text-muted-foreground">Kurulu kapasite</p>
                     </div>
                     <Badge variant="outline" className="text-lg">{systemConfig.powerExportMax} kW</Badge>
@@ -489,7 +489,7 @@ export default function SolarPage() {
                 </CardContent>
               </Card>
 
-              {/* Tahmin Servisi Ayarları */}
+              {/* Tahmin Servisi Ayarlar� */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -503,7 +503,7 @@ export default function SolarPage() {
                     <div className="flex items-center gap-3">
                       <div>
                         <span className="font-medium">Tahmin Servisi</span>
-                        <p className="text-xs text-muted-foreground">Güneş enerjisi tahminlerini etkinleştir</p>
+                        <p className="text-xs text-muted-foreground">G�ne� enerjisi tahminlerini etkinle�tir</p>
                       </div>
                     </div>
                     <Switch 
@@ -519,20 +519,20 @@ export default function SolarPage() {
                         {systemConfig.location.lat.toFixed(4)}, {systemConfig.location.lng.toFixed(4)}
                       </p>
                     </div>
-                    <Badge variant="outline">İstanbul</Badge>
+                    <Badge variant="outline">�stanbul</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-xl border">
                     <div>
                       <span className="font-medium">API Durumu</span>
-                      <p className="text-xs text-muted-foreground">Forecast.Solar bağlantısı</p>
+                      <p className="text-xs text-muted-foreground">Forecast.Solar ba�lant�s�</p>
                     </div>
                     <Badge variant="default" className="bg-green-500">Aktif</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/50">
                     <div>
-                      <span className="font-medium">Son Güncelleme</span>
+                      <span className="font-medium">Son G�ncelleme</span>
                       <p className="text-xs text-muted-foreground">Tahmin verisi</p>
                     </div>
                     <span className="text-sm">{currentTime.toLocaleTimeString("tr-TR")}</span>

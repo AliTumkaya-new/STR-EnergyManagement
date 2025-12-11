@@ -85,7 +85,7 @@ export function ChartGradients() {
 
 // Profesyonel eksen stilleri
 const axisProps = {
-  stroke: 'hsl(var(--muted-foreground))',
+  stroke: 'currentColor',
   fontSize: 11,
   fontFamily: 'Inter, system-ui, sans-serif',
   tickLine: false,
@@ -165,12 +165,12 @@ export function ProfessionalAreaChart({
             dataKey={xAxisKey} 
             {...axisProps}
             dy={10}
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
+            tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
           />
           <YAxis 
             {...axisProps}
             dx={-10}
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
+            tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
             tickFormatter={yAxisFormatter}
           />
           <Tooltip content={<TooltipComponent />} />
@@ -259,12 +259,12 @@ export function ProfessionalLineChart({
             dataKey={xAxisKey} 
             {...axisProps}
             dy={10}
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
+            tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
           />
           <YAxis 
             {...axisProps}
             dx={-10}
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
+            tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
           />
           <Tooltip content={<TooltipComponent />} />
           {showLegend && <Legend content={<CustomLegend />} />}
@@ -365,12 +365,12 @@ export function ProfessionalBarChart({
                 dataKey={xAxisKey} 
                 {...axisProps}
                 dy={10}
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
               />
               <YAxis 
                 {...axisProps}
                 dx={-10}
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'currentColor', className: 'text-muted-foreground' }}
               />
             </>
           ) : (
